@@ -15,7 +15,6 @@ class PostForm(forms.ModelForm):
             'img' : forms.ImageField(attrs={'class' : 'Choose your image'}
         }
 
-
 class CommentForm(forms.ModelForm):
 
     class Meta:
@@ -27,3 +26,6 @@ class CommentForm(forms.ModelForm):
             'text': forms.Textarea(attrs={'class': 'editable medium-editor-textarea'}),
         }
 
+class UploadFileForm(forms.Form):
+    title = forms.CharField(max_length=50)
+    file = forms.FileField()
