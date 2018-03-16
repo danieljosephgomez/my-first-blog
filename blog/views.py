@@ -2,12 +2,34 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from blog.models import Post, Comment
 from django.utils import timezone
-from blog.forms import PostForm, CommentForm
+from django.http import HttpResponseRedirect
+from blog.forms import PostForm, CommentForm, UploadFileForm
 
 from django.views.generic import (TemplateView,ListView,
                                   DetailView,CreateView,
                                   UpdateView,DeleteView)
 
+from django.views.generic.edit import FormView
+from .forms import FileFieldForm
+
+class FileFieldView(FormView):
+    form_class = FileFieldForm
+    template_name = 'upload.html'  # Replace with your template.
+    success_url = 'http://www.bayareaweddingfars.com'  # Replace with your URL or reverse().
+
+    def post(self, request, *args, **kwargs):
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        files = request.FILES.getlist('file_field')
+        if form.is_valid():
+            for f in files:
+                ...  # Do something with each file.
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+# Imaginary function to handle an uploaded file.
+from somewhere import handle_uploaded_file
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -22,7 +44,7 @@ class PostListView(ListView):
 
 class PostDetailView(DetailView):
     model = Post
-
+    
 
 class CreatePostView(LoginRequiredMixin,CreateView):
     login_url = '/login/'
@@ -32,6 +54,15 @@ class CreatePostView(LoginRequiredMixin,CreateView):
 
     model = Post
 
+    def upload_file(request):
+      if request.method == 'POST':
+          form = UploadFileForm(request.POST, request.FILES)
+          if form.is_valie():
+            handle_uploaded_file(request.FILES['files'])
+            return HttpResponseRedirect('/success/url')
+      else:
+        form = UploadFileForm()
+      return render(request, 'upload.html', {'form': form})  
 
 class PostUpdateView(LoginRequiredMixin,UpdateView):
     login_url = '/login/'
